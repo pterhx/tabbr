@@ -1,7 +1,31 @@
 body {
-  width: 400px;
+  padding-top: 10px;
+  width: 500px;
 }
 
 .twitter-typeahead {
   width: 100%;
+}
+
+.tt-suggestion p {
+  font-size: 13px;
+  margin-bottom: 0px;
+}
+
+.tt-suggestion img {
+  margin-right: 2px;
+}
+
+.tt-suggestion {
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+.tt-dropdown-menu {
+  width: 100%;
+}
+
+.tt-is-under-cursor {
+  color: white;
+  background-color: #2ba6cb;
 }
