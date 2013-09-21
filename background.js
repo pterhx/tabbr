@@ -1,8 +1,12 @@
 tabs = {};
 
 var tokenize = function(tab) {
-  titleTokens = tab.title.split(' ');
-  return titleTokens;
+  var tokens = tab.title.split(' ');
+  var regex = /:\/\/(.[^/]+)/
+  var hostTokens = tab.url.match(regex)[1].split('.');
+  hostTokens.pop();
+  tokens = tokens.concat(hostTokens);
+  return tokens;
 };
 
 var createDatum = function(tab) {
