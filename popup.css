@@ -1,3 +1,7 @@
 body {
-  width: 300px;
+  width: 400px;
+}
+
+.twitter-typeahead {
+  width: 100%;
 }
