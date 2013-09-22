@@ -95,6 +95,8 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       return factor * 4;
     } else if (token.indexOf(query) > 0) {
       return factor * 3;
+    } else if (dist <= 2) {
+      return factor * (3 - dist);
     }
     score = min / (dist + min + 1);
     score *= score;
