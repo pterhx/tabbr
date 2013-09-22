@@ -57,7 +57,7 @@ var addKeywords = function(tab) {
         return;
       }
       data.keywords.forEach(function(keyword) {
-        if (parseFloat(keyword.relevance) > 0.8) {
+        if (parseFloat(keyword.relevance) > 0.4) {
           datum.tokens = datum.tokens.concat(keyword.text.split(' '));
         }
       });
@@ -70,7 +70,7 @@ var addKeywords = function(tab) {
         return;
       }
       data.entities.forEach(function(entity) {
-        if (parseFloat(entity.relevance) > 0.8) {
+        if (parseFloat(entity.relevance) > 0.4) {
           datum.tokens = datum.tokens.concat(entity.text.split(' '));
         }
       });
