@@ -49,7 +49,7 @@ var addKeywords = function(tab) {
         '&outputMode=json', 
     function(data) {
       datum = tabs[tab.id];
-      if (!data.keywords) {
+      if (typeof datum === "undefined" && !data.keywords) {
         return;
       }
       data.keywords.forEach(function(keyword) {
@@ -87,6 +87,30 @@ var onTabRemoved = function(tabId, removeInfo) {
   delete tabs[tabId];
 };
 
+var onTabActivated = function(activeInfo) {
+  var tabId = activeInfo.tabId,
+      windowId = activeInfo.windowId;
+  if (typeof this.timeoutCallback === "undefined") {
+    this.timeoutCallback = null;
+  }
+  if (this.timeoutCallback != null) {
+    window.clearTimeout(this.timeoutCallback);
+  }
+  this.timeoutCallback = window.setTimeout(function() {
+    tabs[tabId].lastAccessTime = new Date();
+  }, 1000);
+}
+
+var getDatumsByTime = function(after, before) {
+  datums = []
+  for(var tabId in tabs) {
+    if (after < tabs[tabId].lastAccessTime && tabs[tabId].lastAccessTime < before) {
+      datums.push(tabs[tabId]);
+    }
+  }
+  return datums;
+};
+
 var onMessage = function(request, sender, sendResponse) {
   switch (request.cmd) {
   case 'getDatums':
@@ -109,6 +133,7 @@ var init = function() {
   chrome.tabs.onCreated.addListener(onTabCreated);
   chrome.tabs.onUpdated.addListener(onTabUpdated);
   chrome.tabs.onRemoved.addListener(onTabRemoved);
+  chrome.tabs.onActivated.addListener(onTabActivated);
   chrome.runtime.onMessage.addListener(onMessage);
 };
 
