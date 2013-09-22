@@ -1,4 +1,6 @@
 tabs = {};
+ALCHEMY_KEYWORD_URL = 'http://access.alchemyapi.com/calls/url/URLGetRankedKeywords';
+ALCHEMY_API_KEY = 'edf537eb526275ff0f5438eacdf3d515203a8378';
 
 var tokenize = function(tab) {
   var tokens = tab.title.split(' ');
@@ -28,6 +30,19 @@ var getDatums = function() {
 
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
+  $.get(ALCHEMY_KEYWORD_URL + '?url=' + tab.url + '&apikey=' + ALCHEMY_API_KEY +
+        '&outputMode=json', 
+  function(data) {
+    datum = tabs[tab.id];
+    if (!data.keywords) {
+      return;
+    }
+    data.keywords.forEach(function(keyword) {
+      if (parseFloat(keyword.relevance) > 0.6) {
+        datum.tokens.push(keyword.text);
+      }
+    });
+  });
 };
 
 var onTabUpdated = function(tabId, changeInfo, tab) {
