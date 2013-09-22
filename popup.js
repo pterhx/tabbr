@@ -60,9 +60,11 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     if (dist == 0) {
       console.log('\t' + query + ', ' + token + ': ' + 6);
       return 6;
-    } else if (token.indexOf(query) !== -1) {
+    } else if (token.indexOf(query) === 0) {
       console.log('\t' + query + ', ' + token + ': ' + 4);
       return 4;
+    } else if (token.indexOf(query) > 0) {
+      return 3;
     }
     score = min / (dist + min);
     score *= score;
