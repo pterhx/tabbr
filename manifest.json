@@ -5,10 +5,11 @@
 
   "icons":
   {
-    "16": "favicon.png"
+    "16": "favicon.png",
+    "128": "icon128.png"
   },
 
-  "description": "tabbr is a search engine for tabs. Use tabbr to navigate efficiently between tabs.",
+  "description": "tabbr is a search engine for tabs. Navigating to a tab slows down with more tabs. Instead, tabbr jumps directly to the tab you want by searching for it. A ranking algorithm will select the tab you want based on many factors, such as keywords in the tab content, tab title, tab url, frequency of accesses, most recently used, and other factors.",
   "version": "1.0",
 
   "permissions": [

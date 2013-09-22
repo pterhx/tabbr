@@ -53,9 +53,11 @@ var addKeywords = function(tab) {
     function(data) {
       datum = tabs[tab.id];
       if (typeof datum === "undefined" || typeof data.keywords === "undefined") {
+        console.log(data);
         return;
       }
       data.keywords.forEach(function(keyword) {
+        console.log(keyword.text);
         if (parseFloat(keyword.relevance) > 0.4) {
           datum.tokens = datum.tokens.concat(keyword.text.split(' '));
         }
@@ -69,6 +71,7 @@ var addKeywords = function(tab) {
         return;
       }
       data.entities.forEach(function(entity) {
+        console.log(entity.text);
         if (parseFloat(entity.relevance) > 0.4) {
           datum.tokens = datum.tokens.concat(entity.text.split(' '));
         }
@@ -89,26 +92,28 @@ var onTabUpdated = function(tabId, changeInfo, tab) {
 
 var onTabRemoved = function(tabId, removeInfo) {
   delete tabs[tabId];
+  delete tabInWindow[removeInfo.windowId];
 };
 
+var tabInWindow = {};
 var onTabActivated = function(activeInfo) {
   var tabId = activeInfo.tabId,
       windowId = activeInfo.windowId;
   if (typeof this.timeoutCallback === "undefined") {
     this.timeoutCallback = null;
-    this.tabInWindow = {};
+    tabInWindow = {};
   }
   if (this.timeoutCallback != null) {
     window.clearTimeout(this.timeoutCallback);
   }
   this.timeoutCallback = window.setTimeout(function() {
-    if (typeof this.tabInWindow[windowId] !== "undefined") {
-      tabs[this.tabInWindow[windowId]].lastAccessTime = new Date();
-      tabs[this.tabInWindow[windowId]].active = false;
+    if (typeof tabInWindow[windowId] !== "undefined") {
+      tabs[tabInWindow[windowId]].lastAccessTime = new Date();
+      tabs[tabInWindow[windowId]].active = false;
     }
     tabs[tabId].lastAccessTime = new Date();
     tabs[tabId].active = true;
-    this.tabInWindow[windowId] = tabId;
+    tabInWindow[windowId] = tabId;
   }, 1000);
   chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
     tabs[tabId].previewUrl = url;
@@ -132,12 +137,10 @@ var onMessage = function(request, sender, sendResponse) {
     break;
   case 'addPrefix':
     str = request.prefix;
-    console.log('DUCKS');
     while(str !== "") {
       addPrefix(str, request.tabId);
       str = str.slice(0, -1);
     }
-    console.log('kitties');
     break;
   }
 };
