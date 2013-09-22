@@ -25,7 +25,7 @@ body {
   width: 100%;
 }
 
-.tt-is-under-cursor {
+.selected {
   color: white;
   background-color: #2ba6cb;
 }
