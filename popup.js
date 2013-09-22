@@ -115,6 +115,11 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       currentIndex = Math.min(displayedDatums.length - 1, currentIndex + 1);
       $($('.tt-suggestion')[currentIndex]).addClass('selected');
       return;
+    } else if (e.keyCode === 68 && e.ctrlKey) { // ctrl + d
+      tabIds = displayedDatums.map(function(datum) {
+        return datum.id;
+      });
+      chrome.tabs.remove(tabIds, closeWindow);
     }
     if ((e.keyCode < 65 || e.keyCode > 65 + 52) && e.keyCode != 8 &&
         e.keyCode != 18) {

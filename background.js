@@ -25,7 +25,6 @@ var tokenize = function(tab) {
   var tokens = tab.title.split(' ').filter(gtThree);
   var regex = /:\/\/(.[^/]+)/
   var hostTokens = tab.url.match(regex)[1].split('.').filter(gtThree);
-  hostTokens.pop();
   tokens = tokens.concat(hostTokens);
   return tokens;
 };
