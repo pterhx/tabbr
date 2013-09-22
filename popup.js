@@ -21,12 +21,31 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     $(".tt-suggestions").append(suggestion);
     displayedDatums.push(datum);
   }
+
   for (var i=0; i < response.datums.length; i++) {
     drawDatum(response.datums[i]);
   }
-  var matches = function(query, datum) {
-    return (new RegExp(query.split("").join(".*"))).test(datum.value);
+
+  var datumScore = function(query, datum) {
+    scores = datum.tokens.map(function(token) {
+      return tokenScore(query, token);
+    });
+    datum.score = scores.reduce(function(prev, curr, i, arr) {
+      return prev + curr;
+    });
   };
+
+  var tokenScore = function(query, token) {
+    dist = levDist(query.toLowerCase(), token.toLowerCase());
+    max = Math.max(query.length, token.length);
+    score = (max - dist) / max;
+    return score;
+  };
+
+  var compareDatum = function(a, b) {
+    return b.score - a.score;
+  };
+
   $tabsearch.on('keydown', function(e) {
     if (e.keyCode == 13) { // enter
       return navigateToDatum('penis', displayedDatums[currentIndex]);
@@ -45,12 +64,19 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
         e.keyCode != 18) {
       return;
     }
+
     currentIndex = 0;
     displayedDatums.length = 0;
     $(".tt-suggestions").children().remove();
-    for (var i=0; i < response.datums.length; i++) {
-      var datum = response.datums[i];
-      if (matches($tabsearch.val(), datum)) {
+
+    response.datums.forEach(function(datum) {
+      datumScore($tabsearch.val(), datum);
+    });
+
+    sortedDatums = response.datums.sort(compareDatum);
+    for (var i=0; i < sortedDatums.length; i++) {
+      var datum = sortedDatums[i];
+      if (datum.score >= $tabsearch.val().length / 10) {
         drawDatum(datum);
       }
     }
