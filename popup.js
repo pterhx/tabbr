@@ -63,6 +63,26 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     return -d.score;
   };
 
+  var getDateFilter = function(filterNquery) {
+    if (filterNquery.indexOf("within") >= 0) {
+      var withinNquery = filterNquery.split("within"),
+          not = withinNquery[0].indexOf("not") >= 0,
+          numMinsNquery = withinNquery[1].trim().split(" "),
+          numMins = parseInt(numMinsNquery[0]),
+          date = new Date(new Date() - 60000 * numMins);
+      query = numMinsNquery[1] || "";
+      console.log("filtering for after date: "+date.toLocaleTimeString());
+      return [query, filter];
+
+      function filter(datum) {
+        var res = not === true && new Date(datum.lastAccessTime) < date ||
+          not === false && date < new Date(datum.lastAccessTime);
+        return res;
+      }
+    }
+    return [filterNquery];
+  };
+
   $tabsearch.on('keyup', function(e) {
     if (e.keyCode == 13) { // enter
       return navigateToDatum('penis', displayedDatums[currentIndex]);
@@ -86,14 +106,19 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     displayedDatums.length = 0;
     $(".tt-suggestions").children().remove();
 
-    response.datums.forEach(function(datum) {
-      datumScore($tabsearch.val(), datum);
+    var queryNfilter = getDateFilter($tabsearch.val()),
+        query = queryNfilter[0],
+        filter = queryNfilter[1],
+        datums = typeof filter === "undefined" ? response.datums
+                                               : response.datums.filter(filter);
+    datums.forEach(function(datum) {
+      datumScore(query, datum);
     });
 
-    sortedDatums = _.sortBy(response.datums, compareDatum);
+    sortedDatums = _.sortBy(datums, compareDatum);
     for (var i=0; i < sortedDatums.length; i++) {
       var datum = sortedDatums[i];
-      if (datum.score >= $tabsearch.val().length / 10) {
+      if (datum.score >= query.length / 10) {
         drawDatum(datum);
       }
     }

@@ -2,7 +2,7 @@ tabs = {};
 ALCHEMY_URL = 'http://access.alchemyapi.com/calls/url';
 ALCHEMY_KEYWORD_URL = ALCHEMY_URL + '/URLGetRankedKeywords';
 ALCHEMY_ENTITY_URL = ALCHEMY_URL + '/URLGetRankedNamedEntities';
-ALCHEMY_API_KEY = 'edf537eb526275ff0f5438eacdf3d515203a8378';
+ALCHEMY_API_KEY = 'cfe3e0f5518dbaee05220655cbc703b4763ccfe9';
 
 prefixMap = {};
 
@@ -53,7 +53,8 @@ var addKeywords = function(tab) {
         '&outputMode=json',
     function(data) {
       datum = tabs[tab.id];
-      if (typeof datum === "undefined" || !data.keywords) {
+      if (typeof datum === "undefined" || typeof data.keywords === "undefined") {
+        debugger
         return;
       }
       data.keywords.forEach(function(keyword) {
@@ -80,6 +81,7 @@ var addKeywords = function(tab) {
 
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
+  tabs[tab.id].lastAccessTime = new Date();
   addKeywords(tab);
 };
 
@@ -97,12 +99,19 @@ var onTabActivated = function(activeInfo) {
       windowId = activeInfo.windowId;
   if (typeof this.timeoutCallback === "undefined") {
     this.timeoutCallback = null;
+    this.tabInWindow = {};
   }
   if (this.timeoutCallback != null) {
     window.clearTimeout(this.timeoutCallback);
   }
   this.timeoutCallback = window.setTimeout(function() {
+    if (typeof this.tabInWindow[windowId] !== "undefined") {
+      tabs[this.tabInWindow[windowId]].lastAccessTime = new Date();
+      tabs[this.tabInWindow[windowId]].active = false;
+    }
     tabs[tabId].lastAccessTime = new Date();
+    tabs[tabId].active = true;
+    this.tabInWindow[windowId] = tabId;
   }, 1000);
 }
 
