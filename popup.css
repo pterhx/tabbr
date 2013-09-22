@@ -1,6 +1,7 @@
 body {
   padding-top: 10px;
-  width: 600px;
+  width: 800px;
+  padding-left: 10px;
 }
 
 .twitter-typeahead {

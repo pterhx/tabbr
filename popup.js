@@ -43,15 +43,20 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   var tokenScore = function(query, token) {
     dist = levDist(query.toLowerCase(), token.toLowerCase());
+    if (query.length > token.length) {
+      return 0;
+    }
     min = Math.min(query.length, token.length);
     max = Math.max(query.length, token.length);
     if (dist > (max - min + 1)) {
       return 0;
     }
     if (dist == 0) {
+      console.log('\t' + query + ', ' + token + ': ' + 6);
+      return 6;
+    } else if (token.indexOf(query) !== -1) {
+      console.log('\t' + query + ', ' + token + ': ' + 4);
       return 4;
-    } else if (dist == max - min) {
-      return 2;
     }
     score = min / (dist + min);
     score *= score;

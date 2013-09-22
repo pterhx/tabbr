@@ -54,7 +54,6 @@ var addKeywords = function(tab) {
     function(data) {
       datum = tabs[tab.id];
       if (typeof datum === "undefined" || typeof data.keywords === "undefined") {
-        debugger
         return;
       }
       data.keywords.forEach(function(keyword) {
