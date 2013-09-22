@@ -110,6 +110,9 @@ var onTabActivated = function(activeInfo) {
     tabs[tabId].active = true;
     this.tabInWindow[windowId] = tabId;
   }, 1000);
+  chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
+    tabs[tabId].previewUrl = url;
+  });
 }
 
 var getDatumsByTime = function(after, before) {

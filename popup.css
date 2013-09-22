@@ -1,16 +1,42 @@
 body {
-  padding-top: 10px;
   width: 800px;
-  padding-left: 10px;
+  background: #FDEACD;
+}
+.indx {
+  color: #444;
+  position: absolute;
+  right: 25px;
+  margin-top: 3px;
+}
+
+#main-container {
+  height: 100%;
+}
+#logo {
+  padding-left: 20px;
+}
+#tab-select {
+  padding-top: 10px;
+  background: white;
+}
+#preview {
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+#preview h1 {
+  font-weight: 300;
+  text-align: center;
 }
 
 .twitter-typeahead {
   width: 100%;
 }
 
-.tt-suggestion p {
+.tt-suggestion div {
   font-size: 13px;
   margin-bottom: 0px;
+  overflow: hidden;
 }
 
 .tt-suggestion img {
@@ -20,13 +46,24 @@ body {
 .tt-suggestion {
   padding: 5px;
   margin-bottom: 5px;
+  padding-right: 35px;
+  height: 29px;
 }
 
 .tt-dropdown-menu {
   width: 100%;
 }
 
+.selected .indx {
+  color: white;
+}
+
 .selected {
   color: white;
   background-color: #2ba6cb;
+}
+
+.preview {
+  position: absolute;
+  left: -500px;
 }

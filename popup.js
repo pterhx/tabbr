@@ -1,6 +1,8 @@
-var template = '<p><img width="19px" height="19px" src="{{favIconUrl}}"/> {{value}}</p>';
+var template = '<div><img width="19px" height="19px" src="{{favIconUrl}}"/> {{value}}<a class="indx">{{index}}</a></div>';
 chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   var $tabsearch = $('#tab-search');
+  var $previewImg = $('#preview-img');
+  var $previewH1 = $('#preview-header');
   var closeWindow = function(tab) {
     window.close();
   };
@@ -9,6 +11,18 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
   var displayedDatums = [],
       currentIndex = 0;
+
+  var displayPreview = function(datum) {
+    var previewUrl = datum.previewUrl;
+    if (typeof previewUrl !== 'undefined') {
+      $previewImg.attr('src', previewUrl);
+      $previewImg.show();
+      $previewH1.hide();
+    } else {
+      $previewImg.hide();
+      $previewH1.show();
+    }
+  };
   var drawDatum = function(datum) {
     var suggestion = document.createElement("div");
     suggestion.style.whiteSpace = "nowrap";
@@ -16,6 +30,10 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     suggestion.className = "tt-suggestion";
     if (displayedDatums.length === 0) {
       suggestion.className += ' selected';
+      displayPreview(datum);
+      datum.index = ' ';
+    } else {
+      datum.index = displayedDatums.length;
     }
     suggestion.innerHTML = Hogan.compile(template).render(datum);
     $(".tt-suggestions").append(suggestion);
@@ -23,7 +41,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
 
   response.datums = _.sortBy(response.datums, function(datum) {
-    return -new Date(datum.lastAccessTime);
+    return -(new Date(datum.lastAccessTime)).getTime();
   });
   for (var i=0; i < response.datums.length; i++) {
     drawDatum(response.datums[i]);
@@ -43,7 +61,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       datum.score += scores.reduce(function(prev, curr, i, arr) {
         return prev + curr;
       });
-      
+
     });
     console.log(datum.value + ': ' + datum.score);
   };
@@ -101,7 +119,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   $tabsearch.on('keyup', function(e) {
     if (e.keyCode == 13) { // enter
-      chrome.runtime.sendMessage({cmd: 'addPrefix', 
+      chrome.runtime.sendMessage({cmd: 'addPrefix',
                                   prefix: $tabsearch.val(),
                                   tabId: displayedDatums[currentIndex].id });
       return navigateToDatum(displayedDatums[currentIndex]);
@@ -109,17 +127,23 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       $($('.tt-suggestion')[currentIndex]).removeClass('selected');
       currentIndex = Math.max(0, currentIndex - 1);
       $($('.tt-suggestion')[currentIndex]).addClass('selected');
+      displayPreview(displayedDatums[currentIndex]);
       return;
     } else if (e.keyCode == 40) { // down
       $($('.tt-suggestion')[currentIndex]).removeClass('selected');
       currentIndex = Math.min(displayedDatums.length - 1, currentIndex + 1);
       $($('.tt-suggestion')[currentIndex]).addClass('selected');
+      displayPreview(displayedDatums[currentIndex]);
       return;
     } else if (e.keyCode === 68 && e.ctrlKey) { // ctrl + d
       tabIds = displayedDatums.map(function(datum) {
         return datum.id;
       });
       chrome.tabs.remove(tabIds, closeWindow);
+      return;
+    } else if (e.ctrlKey && e.keyCode >= 49 && e.keyCode <= 57) {
+      currentIndex = e.keyCode - 48;
+      return navigateToDatum(displayedDatums[currentIndex]);
     }
     if ((e.keyCode < 65 || e.keyCode > 65 + 52) && e.keyCode != 8 &&
         e.keyCode != 18) {

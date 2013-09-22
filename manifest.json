@@ -1,14 +1,20 @@
 {
   "manifest_version": 2,
 
-  "name": "Tabber",
+  "name": "tabbr",
 
-  "description": "This extension improves tab navigation.",
+  "icons":
+  {
+    "16": "favicon.png"
+  },
+
+  "description": "tabbr is a search engine for tabs. Use tabbr to navigate efficiently between tabs.",
   "version": "1.0",
 
   "permissions": [
     "tabs",
-    "http://access.alchemyapi.com/*"
+    "http://*/*",
+    "https://*/*"
   ],
 
   "browser_action": {
