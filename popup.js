@@ -3,7 +3,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   var $tabsearch = $('#tab-search');
   var closeWindow = function(tab) {
     window.close();
-  }
+  };
   var navigateToDatum = function(datum) {
     chrome.tabs.update(datum.id, {active: true}, closeWindow);
   };
@@ -14,20 +14,22 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     suggestion.style.whiteSpace = "nowrap";
     suggestion.style.cursor = "pointer";
     suggestion.className = "tt-suggestion";
-    if (displayedDatums.length == 0) {
+    if (displayedDatums.length === 0) {
       suggestion.className += ' selected';
     }
     suggestion.innerHTML = Hogan.compile(template).render(datum);
     $(".tt-suggestions").append(suggestion);
     displayedDatums.push(datum);
-  }
+  };
 
+  response.datums = _.sortBy(response.datums, function(datum) {
+    return -new Date(datum.lastAccessTime);
+  });
   for (var i=0; i < response.datums.length; i++) {
     drawDatum(response.datums[i]);
   }
 
   var datumScore = function(query, datum) {
-    console.log(datum.value + ': ' + datum.score);
     if (typeof datum.prefixMap[query] !== 'undefined') {
       datum.score = (datum.prefixMap[query] + query.length) * 2;
     } else {
@@ -43,13 +45,14 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       });
       
     });
+    console.log(datum.value + ': ' + datum.score);
   };
 
   var tokenScore = function(query, token) {
     token = token.toLowerCase();
     query = query.toLowerCase();
     dist = levDist(query, token);
-    if (query.length == 0 || query.length > token.length) {
+    if (query.length === 0 || query.length > token.length) {
       return 0;
     }
     min = Math.min(query.length, token.length);
@@ -57,7 +60,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     if (dist > (max - min + 1)) {
       return 0;
     }
-    if (dist == 0) {
+    if (dist === 0) {
       console.log('\t' + query + ', ' + token + ': ' + 6);
       return 6;
     } else if (token.indexOf(query) === 0) {
@@ -66,7 +69,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     } else if (token.indexOf(query) > 0) {
       return 3;
     }
-    score = min / (dist + min);
+    score = min / (dist + min + 1);
     score *= score;
     console.log('\t' + query + ', ' + token + ': ' + score);
     return score;
@@ -77,23 +80,23 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
 
   var getDateFilter = function(filterNquery) {
-    if (filterNquery.indexOf("within") >= 0) {
-      var withinNquery = filterNquery.split("within"),
-          not = withinNquery[0].indexOf("not") >= 0,
-          numMinsNquery = withinNquery[1].trim().split(" "),
-          numMins = parseInt(numMinsNquery[0]),
-          date = new Date(new Date() - 60000 * numMins);
-      query = numMinsNquery[1] || "";
-      console.log("filtering for after date: "+date.toLocaleTimeString());
-      return [query, filter];
-
-      function filter(datum) {
-        var res = not === true && new Date(datum.lastAccessTime) < date ||
-          not === false && date < new Date(datum.lastAccessTime);
-        return res;
-      }
+    if (filterNquery.indexOf("within") < 0) {
+      return [filterNquery];
     }
-    return [filterNquery];
+    var withinNquery = filterNquery.split("within"),
+        not = withinNquery[0].indexOf("not") >= 0,
+        numMinsNquery = withinNquery[1].trim().split(" "),
+        numMins = parseInt(numMinsNquery[0], 10),
+        date = new Date(new Date() - 60000 * numMins);
+    query = numMinsNquery[1] || "";
+    console.log("filtering for after date: "+date.toLocaleTimeString());
+    return [query, filter];
+
+    function filter(datum) {
+      var res = not === true && new Date(datum.lastAccessTime) < date ||
+        not === false && date < new Date(datum.lastAccessTime);
+      return res;
+    }
   };
 
   $tabsearch.on('keyup', function(e) {
