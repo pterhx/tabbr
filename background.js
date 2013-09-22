@@ -4,17 +4,16 @@ ALCHEMY_KEYWORD_URL = ALCHEMY_URL + '/URLGetRankedKeywords';
 ALCHEMY_ENTITY_URL = ALCHEMY_URL + '/URLGetRankedNamedEntities';
 ALCHEMY_API_KEY = 'cfe3e0f5518dbaee05220655cbc703b4763ccfe9';
 
-prefixMap = {};
-
-var addPrefix = function(prefix, url) {
-  if (!prefixMap[prefix]) {
-    prefixMap[prefix] = {};
+var addPrefix = function(prefix, tabId) {
+  var tab = tabs[tabId];
+  if (typeof tab === 'undefined') {
+    return;
   }
-  countMap = prefixMap[prefix];
-  if (!countMap[url]) {
-    countMap[url] = 1;
+  var prefixMap = tab['prefixMap'];
+  if (!prefixMap[prefix]) {
+    prefixMap[prefix] = 1;
   } else {
-    countMap[url] += 1;
+    prefixMap[prefix] += 1;
   }
 };
 
@@ -36,7 +35,8 @@ var createDatum = function(tab) {
     value: tab.title,
     tokens: tokenize(tab),
     favIconUrl: tab.favIconUrl,
-    id: tab.id
+    id: tab.id,
+    prefixMap: {}
   }
 };
 
@@ -58,7 +58,6 @@ var addKeywords = function(tab) {
       }
       data.keywords.forEach(function(keyword) {
         if (parseFloat(keyword.relevance) > 0.8) {
-          console.log(keyword.text);
           datum.tokens = datum.tokens.concat(keyword.text.split(' '));
         }
       });
@@ -131,10 +130,12 @@ var onMessage = function(request, sender, sendResponse) {
     break;
   case 'addPrefix':
     str = request.prefix;
+    console.log('DUCKS');
     while(str !== "") {
-      addPrefix(prefix, request.url);
+      addPrefix(str, request.tabId);
       str = str.slice(0, -1);
     }
+    console.log('kitties');
     break;
   }
 };

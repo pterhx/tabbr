@@ -4,7 +4,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   var closeWindow = function(tab) {
     window.close();
   }
-  var navigateToDatum = function(_, datum) {
+  var navigateToDatum = function(datum) {
     chrome.tabs.update(datum.id, {active: true}, closeWindow);
   };
   var displayedDatums = [],
@@ -28,7 +28,11 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   var datumScore = function(query, datum) {
     console.log(datum.value + ': ' + datum.score);
-    datum.score = 0;
+    if (typeof datum.prefixMap[query] !== 'undefined') {
+      datum.score = (datum.prefixMap[query] + query.length) * 2;
+    } else {
+      datum.score = 0;
+    }
     query.split(' ').forEach(function(q) {
       scores = datum.tokens.map(function(token) {
         return tokenScore(q, token);
@@ -90,7 +94,10 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   $tabsearch.on('keyup', function(e) {
     if (e.keyCode == 13) { // enter
-      return navigateToDatum('penis', displayedDatums[currentIndex]);
+      chrome.runtime.sendMessage({cmd: 'addPrefix', 
+                                  prefix: $tabsearch.val(),
+                                  tabId: displayedDatums[currentIndex].id });
+      return navigateToDatum(displayedDatums[currentIndex]);
     } else if (e.keyCode == 38) { // up
       $($('.tt-suggestion')[currentIndex]).removeClass('selected');
       currentIndex = Math.max(0, currentIndex - 1);
