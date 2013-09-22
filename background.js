@@ -54,7 +54,6 @@ var addKeywords = function(tab) {
       data.entities.forEach(function(entity) {
         if (parseFloat(entity.relevance) > 0.6) {
           datum.tokens.push(entity.text);
-          console.log(entity.text);
         }
       });
     });
