@@ -40,15 +40,17 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     dist = levDist(query.toLowerCase(), token.toLowerCase());
     min = Math.min(query.length, token.length);
     max = Math.max(query.length, token.length);
-    if (dist > (max - min / (1.5))) {
+    if (dist > (max - min + 1)) {
       return 0;
     }
     if (dist == 0) {
+      return 4;
+    } else if (dist == max - min) {
       return 2;
     }
-    score = min / dist + 1;
+    score = min / (dist + min);
     score *= score;
-    console.log(query + ', ' + token + ': ' + score);
+    console.log('\t' + query + ', ' + token + ': ' + score);
     return score;
   };
 
@@ -86,7 +88,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     sortedDatums = response.datums.sort(compareDatum);
     for (var i=0; i < sortedDatums.length; i++) {
       var datum = sortedDatums[i];
-      if (datum.score >= $tabsearch.val().length / 15) {
+      if (datum.score >= $tabsearch.val().length / 10) {
         drawDatum(datum);
       }
     }

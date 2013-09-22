@@ -59,7 +59,7 @@ var addKeywords = function(tab) {
       data.keywords.forEach(function(keyword) {
         if (parseFloat(keyword.relevance) > 0.8) {
           console.log(keyword.text);
-          datum.tokens.push(keyword.text);
+          datum.tokens = datum.tokens.concat(keyword.text.split(' '));
         }
       });
     });
@@ -72,7 +72,7 @@ var addKeywords = function(tab) {
       }
       data.entities.forEach(function(entity) {
         if (parseFloat(entity.relevance) > 0.8) {
-          datum.tokens.push(entity.text);
+          datum.tokens = datum.tokens.concat(entity.text.split(' '));
         }
       });
     });
