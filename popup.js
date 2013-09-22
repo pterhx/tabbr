@@ -27,6 +27,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   }
 
   var datumScore = function(query, datum) {
+    console.log(datum.value + ': ' + datum.score);
     scores = datum.tokens.map(function(token) {
       return tokenScore(query, token);
     });
@@ -37,8 +38,17 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   var tokenScore = function(query, token) {
     dist = levDist(query.toLowerCase(), token.toLowerCase());
+    min = Math.min(query.length, token.length);
     max = Math.max(query.length, token.length);
-    score = (max - dist) / max;
+    if (dist > (max - min / (1.5))) {
+      return 0;
+    }
+    if (dist == 0) {
+      return 2;
+    }
+    score = min / dist + 1;
+    score *= score;
+    console.log(query + ', ' + token + ': ' + score);
     return score;
   };
 
@@ -46,7 +56,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     return b.score - a.score;
   };
 
-  $tabsearch.on('keydown', function(e) {
+  $tabsearch.on('keyup', function(e) {
     if (e.keyCode == 13) { // enter
       return navigateToDatum('penis', displayedDatums[currentIndex]);
     } else if (e.keyCode == 38) { // up
@@ -76,7 +86,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     sortedDatums = response.datums.sort(compareDatum);
     for (var i=0; i < sortedDatums.length; i++) {
       var datum = sortedDatums[i];
-      if (datum.score >= $tabsearch.val().length / 10) {
+      if (datum.score >= $tabsearch.val().length / 15) {
         drawDatum(datum);
       }
     }

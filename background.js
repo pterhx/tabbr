@@ -18,10 +18,14 @@ var addPrefix = function(prefix, url) {
   }
 };
 
+var gtThree = function(str) {
+  return str.length > 3;
+};
+
 var tokenize = function(tab) {
-  var tokens = tab.title.split(' ');
+  var tokens = tab.title.split(' ').filter(gtThree);
   var regex = /:\/\/(.[^/]+)/
-  var hostTokens = tab.url.match(regex)[1].split('.');
+  var hostTokens = tab.url.match(regex)[1].split('.').filter(gtThree);
   hostTokens.pop();
   tokens = tokens.concat(hostTokens);
   return tokens;
@@ -46,20 +50,21 @@ var getDatums = function() {
 
 var addKeywords = function(tab) {
   $.get(ALCHEMY_KEYWORD_URL + '?url=' + tab.url + '&apikey=' + ALCHEMY_API_KEY +
-        '&outputMode=json', 
+        '&outputMode=json',
     function(data) {
       datum = tabs[tab.id];
-      if (typeof datum === "undefined" && !data.keywords) {
+      if (typeof datum === "undefined" || !data.keywords) {
         return;
       }
       data.keywords.forEach(function(keyword) {
         if (parseFloat(keyword.relevance) > 0.8) {
+          console.log(keyword.text);
           datum.tokens.push(keyword.text);
         }
       });
     });
   $.get(ALCHEMY_ENTITY_URL + '?url=' + tab.url + '&apikey=' + ALCHEMY_API_KEY +
-        '&outputMode=json', 
+        '&outputMode=json',
     function(data) {
       datum = tabs[tab.id];
       if (!data.entities) {
