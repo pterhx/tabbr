@@ -46,7 +46,9 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
 
   var tokenScore = function(query, token) {
-    dist = levDist(query.toLowerCase(), token.toLowerCase());
+    token = token.toLowerCase();
+    query = query.toLowerCase();
+    dist = levDist(query, token);
     if (query.length > token.length) {
       return 0;
     }
