@@ -28,11 +28,16 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
 
   var datumScore = function(query, datum) {
     console.log(datum.value + ': ' + datum.score);
-    scores = datum.tokens.map(function(token) {
-      return tokenScore(query, token);
-    });
-    datum.score = scores.reduce(function(prev, curr, i, arr) {
-      return prev + curr;
+    datum.score = 0;
+    query.split(' ').forEach(function(q) {
+      scores = datum.tokens.map(function(token) {
+        return tokenScore(q, token);
+      });
+      scores.push(0);
+      datum.score += scores.reduce(function(prev, curr, i, arr) {
+        return prev + curr;
+      });
+      
     });
   };
 
@@ -54,8 +59,8 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     return score;
   };
 
-  var compareDatum = function(a, b) {
-    return b.score - a.score;
+  var compareDatum = function(d) {
+    return -d.score;
   };
 
   $tabsearch.on('keyup', function(e) {
@@ -85,7 +90,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       datumScore($tabsearch.val(), datum);
     });
 
-    sortedDatums = response.datums.sort(compareDatum);
+    sortedDatums = _.sortBy(response.datums, compareDatum);
     for (var i=0; i < sortedDatums.length; i++) {
       var datum = sortedDatums[i];
       if (datum.score >= $tabsearch.val().length / 10) {
