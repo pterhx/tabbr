@@ -49,7 +49,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     token = token.toLowerCase();
     query = query.toLowerCase();
     dist = levDist(query, token);
-    if (query.length > token.length) {
+    if (query.length == 0 || query.length > token.length) {
       return 0;
     }
     min = Math.min(query.length, token.length);
