@@ -69,8 +69,17 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   var tokenScore = function(query, token) {
     token = token.toLowerCase();
     query = query.toLowerCase();
-    dist = levDist(query, token);
-    if (query.length === 0 || query.length > token.length) {
+    var dist = levDist(query, token);
+    var factor = 1;
+    if (query.length === 0) {
+      return 0;
+    }
+
+    if (query.charAt(0) === '-') {
+      query = query.slice(1);
+      factor = -1;
+    }
+    if (query.length > token.length) {
       return 0;
     }
     min = Math.min(query.length, token.length);
@@ -80,17 +89,17 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     }
     if (dist === 0) {
       console.log('\t' + query + ', ' + token + ': ' + 6);
-      return 6;
+      return factor * 6;
     } else if (token.indexOf(query) === 0) {
       console.log('\t' + query + ', ' + token + ': ' + 4);
-      return 4;
+      return factor * 4;
     } else if (token.indexOf(query) > 0) {
-      return 3;
+      return factor * 3;
     }
     score = min / (dist + min + 1);
     score *= score;
     console.log('\t' + query + ', ' + token + ': ' + score);
-    return score;
+    return factor * score;
   };
 
   var compareDatum = function(d) {
