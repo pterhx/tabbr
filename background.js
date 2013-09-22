@@ -4,6 +4,20 @@ ALCHEMY_KEYWORD_URL = ALCHEMY_URL + '/URLGetRankedKeywords';
 ALCHEMY_ENTITY_URL = ALCHEMY_URL + '/URLGetRankedNamedEntities';
 ALCHEMY_API_KEY = 'edf537eb526275ff0f5438eacdf3d515203a8378';
 
+prefixMap = {};
+
+var addPrefix = function(prefix, url) {
+  if (!prefixMap[prefix]) {
+    prefixMap[prefix] = {};
+  }
+  countMap = prefixMap[prefix];
+  if (!countMap[url]) {
+    countMap[url] = 1;
+  } else {
+    countMap[url] += 1;
+  }
+};
+
 var tokenize = function(tab) {
   var tokens = tab.title.split(' ');
   var regex = /:\/\/(.[^/]+)/
@@ -39,7 +53,7 @@ var addKeywords = function(tab) {
         return;
       }
       data.keywords.forEach(function(keyword) {
-        if (parseFloat(keyword.relevance) > 0.6) {
+        if (parseFloat(keyword.relevance) > 0.8) {
           datum.tokens.push(keyword.text);
         }
       });
@@ -52,7 +66,7 @@ var addKeywords = function(tab) {
         return;
       }
       data.entities.forEach(function(entity) {
-        if (parseFloat(entity.relevance) > 0.6) {
+        if (parseFloat(entity.relevance) > 0.8) {
           datum.tokens.push(entity.text);
         }
       });
@@ -74,8 +88,17 @@ var onTabRemoved = function(tabId, removeInfo) {
 };
 
 var onMessage = function(request, sender, sendResponse) {
-  if (request.cmd === 'getDatums') {
+  switch (request.cmd) {
+  case 'getDatums':
     sendResponse({datums: getDatums()});
+    break;
+  case 'addPrefix':
+    str = request.prefix;
+    while(str !== "") {
+      addPrefix(prefix, request.url);
+      str = str.slice(0, -1);
+    }
+    break;
   }
 };
 
