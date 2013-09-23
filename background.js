@@ -32,6 +32,7 @@ var tokenize = function(tab) {
 var createDatum = function(tab) {
   return {
     value: tab.title,
+    windowId: tab.windowId,
     tokens: tokenize(tab),
     favIconUrl: tab.favIconUrl,
     id: tab.id,
