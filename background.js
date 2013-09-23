@@ -2,7 +2,7 @@ tabs = {};
 ALCHEMY_URL = 'http://access.alchemyapi.com/calls/url';
 ALCHEMY_KEYWORD_URL = ALCHEMY_URL + '/URLGetRankedKeywords';
 ALCHEMY_ENTITY_URL = ALCHEMY_URL + '/URLGetRankedNamedEntities';
-ALCHEMY_API_KEY = 'cfe3e0f5518dbaee05220655cbc703b4763ccfe9';
+ALCHEMY_API_KEY = '2094dd01fd7cbceb7e1bb916840e40e81f25d16f';
 
 var addPrefix = function(prefix, tabId) {
   var tab = tabs[tabId];
@@ -45,6 +45,7 @@ var getDatums = function() {
   for(tabId in tabs) {
     datums.push(tabs[tabId]);
   }
+  console.log(datums);
   return datums;
 };
 
@@ -59,7 +60,7 @@ var addKeywords = function(tab) {
       }
       data.keywords.forEach(function(keyword) {
         console.log(keyword.text);
-        if (parseFloat(keyword.relevance) > 0.4) {
+        if (parseFloat(keyword.relevance) > 0.2) {
           datum.tokens = datum.tokens.concat(keyword.text.split(' '));
         }
       });
@@ -73,7 +74,7 @@ var addKeywords = function(tab) {
       }
       data.entities.forEach(function(entity) {
         console.log(entity.text);
-        if (parseFloat(entity.relevance) > 0.4) {
+        if (parseFloat(entity.relevance) > 0.2) {
           datum.tokens = datum.tokens.concat(entity.text.split(' '));
         }
       });

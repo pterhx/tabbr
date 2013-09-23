@@ -9,8 +9,9 @@
     "128": "icon128.png"
   },
 
-  "description": "tabbr is a search engine for tabs. Navigating to a tab slows down with more tabs. Instead, tabbr jumps directly to the tab you want by searching for it. A ranking algorithm will select the tab you want based on many factors, such as keywords in the tab content, tab title, tab url, frequency of accesses, most recently used, and other factors.",
-  "version": "1.0",
+  "description": "tabbr is a search engine for easier tab navigation.",
+
+  "version": "0.0.0.1",
 
   "permissions": [
     "tabs",
