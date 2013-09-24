@@ -25,10 +25,10 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     }
   };
   var drawDatum = function(datum) {
-    var suggestion = document.createElement("div");
-    suggestion.style.whiteSpace = "nowrap";
-    suggestion.style.cursor = "pointer";
-    suggestion.className = "tt-suggestion";
+    var suggestion = document.createElement('div');
+    suggestion.style.whiteSpace = 'nowrap';
+    suggestion.style.cursor = 'pointer';
+    suggestion.className = 'tt-suggestion';
     if (displayedDatums.length === 0) {
       suggestion.className += ' selected';
       displayPreview(datum);
@@ -37,7 +37,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       datum.index = displayedDatums.length;
     }
     suggestion.innerHTML = Hogan.compile(template).render(datum);
-    $(".tt-suggestions").append(suggestion);
+    $('.tt-suggestions').append(suggestion);
     displayedDatums.push(datum);
   };
 
@@ -180,6 +180,13 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       if (datum.score >= query.length / 10) {
         drawDatum(datum);
       }
+    }
+    if (displayedDatums.length === 0) {
+      var noResult = document.createElement('p');
+      noResult.innerText = 'no results found :(';
+      $(".tt-suggestions").append(noResult);
+      $previewImg.hide();
+      $previewH1.show();
     }
   });
 

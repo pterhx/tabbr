@@ -112,7 +112,7 @@ var onTabActivated = function(activeInfo) {
     return;
   }
   reloadTab(tabId);
-  if (typeof this.timeoutCallback === "undefined") {
+  if (typeof this.timeoutCallback === 'undefined') {
     this.timeoutCallback = null;
     tabInWindow = {};
   }
@@ -120,7 +120,7 @@ var onTabActivated = function(activeInfo) {
     window.clearTimeout(this.timeoutCallback);
   }
   this.timeoutCallback = window.setTimeout(function() {
-    if (typeof tabInWindow[windowId] !== "undefined") {
+    if (typeof tabInWindow[windowId] !== 'undefined') {
       tabs[tabInWindow[windowId]].lastAccessTime = new Date();
       tabs[tabInWindow[windowId]].active = false;
     }
@@ -162,7 +162,7 @@ var onMessage = function(request, sender, sendResponse) {
     break;
   case 'addPrefix':
     str = request.prefix;
-    while(str !== "") {
+    while(str !== '') {
       addPrefix(str, request.tabId);
       str = str.slice(0, -1);
     }
