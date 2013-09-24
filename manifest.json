@@ -11,7 +11,7 @@
 
   "description": "tabbr is a search engine for easier tab navigation, kind of like spotlight for tabs.",
 
-  "version": "0.0.0.3",
+  "version": "0.0.0.4",
 
   "permissions": [
     "tabs",
