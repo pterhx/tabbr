@@ -100,7 +100,6 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       score = min / (dist + min + 1);
       score *= score;
     }
-    console.log(token.weight);
     score = score * token.weight * factor;
     console.log('\t' + query + ', ' + term + ': ' + score);
     return score;
@@ -120,7 +119,6 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
         numMins = parseInt(numMinsNquery[0], 10),
         date = new Date(new Date() - 60000 * numMins);
     query = numMinsNquery[1] || "";
-    console.log("filtering for after date: "+date.toLocaleTimeString());
     return [query, filter];
 
     function filter(datum) {

@@ -50,7 +50,6 @@ var getDatums = function() {
   for(tabId in tabs) {
     datums.push(tabs[tabId]);
   }
-  console.log(datums);
   return datums;
 };
 
@@ -70,7 +69,6 @@ var addKeywords = function(tab) {
       }
     });
 
-    console.log(tokens);
     datum.tokens = datum.tokens.concat(tokens);
   });
 }
