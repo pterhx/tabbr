@@ -34,7 +34,9 @@ var tokenize = function(tab) {
     terms = terms.concat(hostTerms);
   }
   tokens = terms.map(getTitleToken);
-  tokens[0].weight = 1.5;
+  if (tokens.length > 0) {
+    tokens[0].weight = 1.5;
+  }
   return tokens;
 };
 
@@ -113,7 +115,6 @@ var onTabRemoved = function(tabId, removeInfo) {
 var tabInWindow = {};
 var lastActiveTabId = 0;
 var onTabActivated = function(activeInfo) {
-  console.log('ON ACTIVATED');
   var tabId = activeInfo.tabId,
       windowId = activeInfo.windowId;
   lastActiveTabId = tabId;
