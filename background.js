@@ -79,16 +79,32 @@ var onTabCreated = function(tab) {
   if (tab.status === 'complete') {
     addKeywords(tab);
   }
+  console.log('created');
+  console.log(tab);
+};
+
+var reloadTab = function(tabId) {
+  chrome.tabs.get(tabId, function(tab) {
+    tabs[tab.id] = createDatum(tab);
+    if (tab.status !== 'complete') {
+      reloadTab(tab.id);
+    }
+  });
 };
 
 var onTabUpdated = function(tabId, changeInfo, tab) {
   tabs[tabId] = createDatum(tab);
+  console.log('updated');
+  console.log(tab);
   if (changeInfo.status === 'complete') {
     addKeywords(tab);
+  } else {
+    reloadTab(tabId);
   }
 };
 
 var onTabRemoved = function(tabId, removeInfo) {
+  console.log(tabId);
   delete tabs[tabId];
   delete tabInWindow[removeInfo.windowId];
 };
@@ -97,6 +113,10 @@ var tabInWindow = {};
 var onTabActivated = function(activeInfo) {
   var tabId = activeInfo.tabId,
       windowId = activeInfo.windowId;
+  if (typeof tabs[tabId] === 'undefined') {
+    return;
+  }
+  reloadTab(tabId);
   if (typeof this.timeoutCallback === "undefined") {
     this.timeoutCallback = null;
     tabInWindow = {};
@@ -109,21 +129,14 @@ var onTabActivated = function(activeInfo) {
       tabs[tabInWindow[windowId]].lastAccessTime = new Date();
       tabs[tabInWindow[windowId]].active = false;
     }
-    if (typeof tabs[tabId] === undefined) {
-      chrome.tabs.get(tabId, function (tab) {
-        tabs[tabId] = createDatum(tab);
-        tabs[tabId].lastAccessTime = new Date();
-        tabs[tabId].active = tab.active;
-        tabInWindow[windowId] = tabId;
-      }); 
-    } else {
-      tabs[tabId].lastAccessTime = new Date();
-      tabs[tabId].active = true;
-      tabInWindow[windowId] = tabId;
-    }
+    console.log(tabId);
+    tabs[tabId].lastAccessTime = new Date();
+    tabs[tabId].active = true;
+    tabInWindow[windowId] = tabId;
   }, 1000);
   chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
-    if (typeof tabs[tabId] !== undefined) {
+    if (typeof tabs[tabId] !== 'undefined') {
+      console.log(tabId);
       tabs[tabId].previewUrl = url;
     }
   });

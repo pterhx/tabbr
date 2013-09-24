@@ -9,9 +9,9 @@
     "128": "icon128.png"
   },
 
-  "description": "tabbr is a search engine for easier tab navigation.",
+  "description": "tabbr is a search engine for easier tab navigation, kind of like spotlight for tabs.",
 
-  "version": "0.0.0.1",
+  "version": "0.0.0.3",
 
   "permissions": [
     "tabs",
