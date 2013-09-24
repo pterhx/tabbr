@@ -1,8 +1,4 @@
 tabs = {};
-ALCHEMY_URL = 'http://access.alchemyapi.com/calls/url';
-ALCHEMY_KEYWORD_URL = ALCHEMY_URL + '/URLGetRankedKeywords';
-ALCHEMY_ENTITY_URL = ALCHEMY_URL + '/URLGetRankedNamedEntities';
-ALCHEMY_API_KEY = '2094dd01fd7cbceb7e1bb916840e40e81f25d16f';
 
 var addPrefix = function(prefix, tabId) {
   var tab = tabs[tabId];
@@ -50,35 +46,15 @@ var getDatums = function() {
 };
 
 var addKeywords = function(tab) {
-  $.get(ALCHEMY_KEYWORD_URL + '?url=' + tab.url + '&apikey=' + ALCHEMY_API_KEY +
-        '&outputMode=json',
-    function(data) {
-      datum = tabs[tab.id];
-      if (typeof datum === "undefined" || typeof data.keywords === "undefined") {
-        console.log(data);
-        return;
-      }
-      data.keywords.forEach(function(keyword) {
-        console.log(keyword.text);
-        if (parseFloat(keyword.relevance) > 0.2) {
-          datum.tokens = datum.tokens.concat(keyword.text.split(' '));
-        }
-      });
-    });
-  $.get(ALCHEMY_ENTITY_URL + '?url=' + tab.url + '&apikey=' + ALCHEMY_API_KEY +
-        '&outputMode=json',
-    function(data) {
-      datum = tabs[tab.id];
-      if (!data.entities) {
-        return;
-      }
-      data.entities.forEach(function(entity) {
-        console.log(entity.text);
-        if (parseFloat(entity.relevance) > 0.2) {
-          datum.tokens = datum.tokens.concat(entity.text.split(' '));
-        }
-      });
-    });
+  chrome.tabs.sendMessage(tab.id, {}, function(response) {
+    datum = tabs[tab.id];
+    if (typeof datum === 'undefined' || typeof response === 'undefined') {
+      return;
+    }
+    terms = glossary.extract(response.text);
+    console.log(terms);
+    datum.tokens = datum.tokens.concat(terms);
+  });
 }
 
 var onTabCreated = function(tab) {
