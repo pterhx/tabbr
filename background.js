@@ -27,10 +27,10 @@ var getTitleToken = function(term) {
 var tokenize = function(tab) {
   var terms = tab.title.split(' ').filter(gtThree);
   var regex = /:\/\/(.[^/]+)/
-  var hostTerms = tab.url.match(regex)[1];
+  var hostTerms = tab.url.match(regex);
   // TODO: Handle case when URL is empty.
   if (hostTerms !== null) {
-    hostTerms = hostTerms.split('.').filter(gtThree);
+    hostTerms = hostTerms[1].split('.').filter(gtThree);
     terms = terms.concat(hostTerms);
   }
   tokens = terms.map(getTitleToken);
