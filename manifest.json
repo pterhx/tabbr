@@ -29,6 +29,7 @@
                 "lexicon.js_",
                 "lexer.js",
                 "POSTagger.js",
+                "inflection.js",
                 "glossary.js",
                 "jquery.js",
                 "background.js"]

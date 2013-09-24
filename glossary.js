@@ -7,12 +7,16 @@ function Glossary(opts) {
    });
 }
 
+function normalize(word) {
+  return word.singularize();
+}
+
 Glossary.prototype.extract = function(text) {
    var tags = new POSTagger().tag(new Lexer().lex(text)),
        terms = {};
 
    function add(word) {
-     var norm = word;
+     var norm = normalize(word);
 
      terms[norm] = terms[norm] || {
         count: 0,
@@ -61,7 +65,7 @@ Glossary.prototype.extract = function(text) {
   if (opts.blacklist) {
      terms = _(terms).reject(function(term) {
         return _(opts.blacklist).any(function(black) {
-           return term.norm.toLowerCase().indexOf(black.toLowerCase()) >= 0;
+           return term.norm.toLowerCase().indexOf(normalize(black).toLowerCase()) >= 0;
         })
      })
   }

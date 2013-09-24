@@ -60,12 +60,16 @@ var addKeywords = function(tab) {
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
   tabs[tab.id].lastAccessTime = new Date();
-  addKeywords(tab);
+  if (tab.status === 'complete') {
+    addKeywords(tab);
+  }
 };
 
 var onTabUpdated = function(tabId, changeInfo, tab) {
   tabs[tabId] = createDatum(tab);
-  addKeywords(tab);
+  if (changeInfo.status === 'complete') {
+    addKeywords(tab);
+  }
 };
 
 var onTabRemoved = function(tabId, removeInfo) {
@@ -89,12 +93,23 @@ var onTabActivated = function(activeInfo) {
       tabs[tabInWindow[windowId]].lastAccessTime = new Date();
       tabs[tabInWindow[windowId]].active = false;
     }
-    tabs[tabId].lastAccessTime = new Date();
-    tabs[tabId].active = true;
-    tabInWindow[windowId] = tabId;
+    if (typeof tabs[tabId] === undefined) {
+      chrome.tabs.get(tabId, function (tab) {
+        tabs[tabId] = createDatum(tab);
+        tabs[tabId].lastAccessTime = new Date();
+        tabs[tabId].active = tab.active;
+        tabInWindow[windowId] = tabId;
+      }); 
+    } else {
+      tabs[tabId].lastAccessTime = new Date();
+      tabs[tabId].active = true;
+      tabInWindow[windowId] = tabId;
+    }
   }, 1000);
   chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
-    tabs[tabId].previewUrl = url;
+    if (typeof tabs[tabId] !== undefined) {
+      tabs[tabId].previewUrl = url;
+    }
   });
 }
 
