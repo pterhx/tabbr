@@ -79,8 +79,6 @@ var onTabCreated = function(tab) {
   if (tab.status === 'complete') {
     addKeywords(tab);
   }
-  console.log('created');
-  console.log(tab);
 };
 
 var reloadTab = function(tabId) {
@@ -94,8 +92,6 @@ var reloadTab = function(tabId) {
 
 var onTabUpdated = function(tabId, changeInfo, tab) {
   tabs[tabId] = createDatum(tab);
-  console.log('updated');
-  console.log(tab);
   if (changeInfo.status === 'complete') {
     addKeywords(tab);
   } else {
@@ -104,7 +100,6 @@ var onTabUpdated = function(tabId, changeInfo, tab) {
 };
 
 var onTabRemoved = function(tabId, removeInfo) {
-  console.log(tabId);
   delete tabs[tabId];
   delete tabInWindow[removeInfo.windowId];
 };
@@ -129,14 +124,12 @@ var onTabActivated = function(activeInfo) {
       tabs[tabInWindow[windowId]].lastAccessTime = new Date();
       tabs[tabInWindow[windowId]].active = false;
     }
-    console.log(tabId);
     tabs[tabId].lastAccessTime = new Date();
     tabs[tabId].active = true;
     tabInWindow[windowId] = tabId;
   }, 1000);
   chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
     if (typeof tabs[tabId] !== 'undefined') {
-      console.log(tabId);
       tabs[tabId].previewUrl = url;
     }
   });
