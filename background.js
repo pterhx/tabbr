@@ -17,11 +17,20 @@ var gtThree = function(str) {
   return str.length > 3;
 };
 
+var getTitleToken = function(term) {
+  return {
+    term: term,
+    weight: 1
+  };
+};
+
 var tokenize = function(tab) {
-  var tokens = tab.title.split(' ').filter(gtThree);
+  var terms = tab.title.split(' ').filter(gtThree);
   var regex = /:\/\/(.[^/]+)/
-  var hostTokens = tab.url.match(regex)[1].split('.').filter(gtThree);
-  tokens = tokens.concat(hostTokens);
+  var hostTerms = tab.url.match(regex)[1].split('.').filter(gtThree);
+  terms = terms.concat(hostTerms);
+  tokens = terms.map(getTitleToken);
+  tokens[0].weight = 1.5;
   return tokens;
 };
 
@@ -52,8 +61,17 @@ var addKeywords = function(tab) {
       return;
     }
     terms = glossary.extract(response.text);
-    console.log(terms);
-    datum.tokens = datum.tokens.concat(terms);
+
+    tokens = _.map(terms, function(term) {
+      var weight = Math.min(term.count / 10, 0.7);
+      return {
+        term: term.word.toLowerCase(),
+        weight: weight
+      }
+    });
+
+    console.log(tokens);
+    datum.tokens = datum.tokens.concat(tokens);
   });
 }
 

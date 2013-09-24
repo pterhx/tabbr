@@ -3,7 +3,7 @@ function Glossary(opts) {
       minFreq: 2,
       collapse: false,
       blacklist: [],
-      verbose: false
+      verbose: true
    });
 }
 

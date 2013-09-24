@@ -68,9 +68,9 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
 
   var tokenScore = function(query, token) {
-    token = token.toLowerCase();
+    term = token.term.toLowerCase();
     query = query.toLowerCase();
-    var dist = levDist(query, token);
+    var dist = levDist(query, term);
     var factor = 1;
     if (query.length === 0) {
       return 0;
@@ -80,29 +80,30 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       query = query.slice(1);
       factor = -1;
     }
-    if (query.length > token.length) {
+    if (query.length > term.length) {
       return 0;
     }
-    min = Math.min(query.length, token.length);
-    max = Math.max(query.length, token.length);
+    min = Math.min(query.length, term.length);
+    max = Math.max(query.length, term.length);
     if (dist > (max - min + 1)) {
       return 0;
     }
     if (dist === 0) {
-      console.log('\t' + query + ', ' + token + ': ' + 6);
-      return factor * 6;
-    } else if (token.indexOf(query) === 0) {
-      console.log('\t' + query + ', ' + token + ': ' + 4);
-      return factor * 4;
-    } else if (token.indexOf(query) > 0) {
-      return factor * 3;
-    } else if (dist <= 2) {
-      return factor * (3 - dist);
+      score = 6;
+    } else if (term.indexOf(query) === 0) {
+      score = 4;
+    } else if (term.indexOf(query) > 0) {
+      score =  3;
+    } else if (dist <= token.length / 3.5) {
+      score = token.length / 3 - dist + 1;
+    } else {
+      score = min / (dist + min + 1);
+      score *= score;
     }
-    score = min / (dist + min + 1);
-    score *= score;
-    console.log('\t' + query + ', ' + token + ': ' + score);
-    return factor * score;
+    console.log(token.weight);
+    score = score * token.weight * factor;
+    console.log('\t' + query + ', ' + term + ': ' + score);
+    return score;
   };
 
   var compareDatum = function(d) {
