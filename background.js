@@ -140,7 +140,7 @@ var onTabReplaced = function(addedTabId, removedTabId) {
   delete tabs[removedTabId];
   for (var windowId in tabInWindow) {
     if (tabInWindow[windowId] === removedTabId) {
-      tabsInWindow[windowId] = addedTabId;
+      tabInWindow[windowId] = addedTabId;
     }
   }
 };
