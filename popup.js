@@ -33,8 +33,10 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       suggestion.className += ' selected';
       displayPreview(datum);
       datum.index = ' ';
-    } else {
+    } else if (displayedDatums.length <= 9){
       datum.index = displayedDatums.length;
+    } else {
+      datum.index = ' ';
     }
     suggestion.innerHTML = Hogan.compile(template).render(datum);
     $('.tt-suggestions').append(suggestion);
