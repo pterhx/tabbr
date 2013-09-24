@@ -52,7 +52,9 @@ var createDatum = function(tab) {
 var getDatums = function() {
   datums = []
   for(tabId in tabs) {
-    datums.push(tabs[tabId]);
+    if (tabs[tabId].id !== lastActiveTabId) {
+      datums.push(tabs[tabId]);
+    }
   }
   return datums;
 };
@@ -109,9 +111,12 @@ var onTabRemoved = function(tabId, removeInfo) {
 };
 
 var tabInWindow = {};
+var lastActiveTabId = 0;
 var onTabActivated = function(activeInfo) {
+  console.log('ON ACTIVATED');
   var tabId = activeInfo.tabId,
       windowId = activeInfo.windowId;
+  lastActiveTabId = tabId;
   if (typeof tabs[tabId] === 'undefined') {
     return;
   }
@@ -146,6 +151,9 @@ var onTabReplaced = function(addedTabId, removedTabId) {
     if (tabInWindow[windowId] === removedTabId) {
       tabInWindow[windowId] = addedTabId;
     }
+  }
+  if (lastActiveTabId === removedTabId) {
+    lastActiveTabId = addedTabId;
   }
 };
 
