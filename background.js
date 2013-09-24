@@ -138,8 +138,8 @@ var onTabActivated = function(activeInfo) {
 var onTabReplaced = function(addedTabId, removedTabId) {
   tabs[addedTabId] = tabs[removedTabId];
   delete tabs[removedTabId];
-  for (windowId in tabsInWindow) {
-    if (tabsInWindow[windowId] === removedTabId) {
+  for (var windowId in tabInWindow) {
+    if (tabInWindow[windowId] === removedTabId) {
       tabsInWindow[windowId] = addedTabId;
     }
   }
