@@ -158,7 +158,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
       currentIndex = e.keyCode - 48;
       return navigateToDatum(displayedDatums[currentIndex]);
     }
-    if ((e.keyCode < 65 || e.keyCode > 65 + 52) && e.keyCode != 8 &&
+    if ((e.keyCode < 48 || e.keyCode > 65 + 52) && e.keyCode != 8 &&
         e.keyCode != 18) {
       return;
     }
