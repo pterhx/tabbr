@@ -135,6 +135,16 @@ var onTabActivated = function(activeInfo) {
   });
 }
 
+var onTabReplaced = function(addedTabId, removedTabId) {
+  tabs[addedTabId] = tabs[removedTabId];
+  delete tabs[removedTabId];
+  for (windowId in tabsInWindow) {
+    if (tabsInWindow[windowId] === removedTabId) {
+      tabsInWindow[windowId] = addedTabId;
+    }
+  }
+};
+
 var getDatumsByTime = function(after, before) {
   datums = []
   for(var tabId in tabs) {
@@ -167,6 +177,7 @@ var init = function() {
   chrome.tabs.onCreated.addListener(onTabCreated);
   chrome.tabs.onUpdated.addListener(onTabUpdated);
   chrome.tabs.onRemoved.addListener(onTabRemoved);
+  chrome.tabs.onReplaced.addListener(onTabReplaced);
   chrome.tabs.onActivated.addListener(onTabActivated);
   chrome.runtime.onMessage.addListener(onMessage);
 };
