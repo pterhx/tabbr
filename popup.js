@@ -7,8 +7,9 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
     window.close();
   };
   var navigateToDatum = function(datum) {
-    chrome.windows.update(datum.windowId, {focused: true}, closeWindow);
-    chrome.tabs.update(datum.id, {active: true}, closeWindow);
+    chrome.windows.update(datum.windowId, {focused: true}, function() {
+      chrome.tabs.update(datum.id, {active: true}, closeWindow);
+    });
   };
   var displayedDatums = [],
       currentIndex = 0;
