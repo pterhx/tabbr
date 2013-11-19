@@ -137,13 +137,13 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
                                   prefix: $tabsearch.val(),
                                   tabId: displayedDatums[currentIndex].id });
       return navigateToDatum(displayedDatums[currentIndex]);
-    } else if (e.keyCode == 38) { // up
+    } else if (e.keyCode == 38 || (e.keyCode == 80 && e.ctrlKey)) { // up
       $($('.tt-suggestion')[currentIndex]).removeClass('selected');
       currentIndex = Math.max(0, currentIndex - 1);
       $($('.tt-suggestion')[currentIndex]).addClass('selected');
       displayPreview(displayedDatums[currentIndex]);
       return;
-    } else if (e.keyCode == 40) { // down
+    } else if (e.keyCode == 40 || (e.keyCode == 78 && e.ctrlKey)) { // down
       $($('.tt-suggestion')[currentIndex]).removeClass('selected');
       currentIndex = Math.min(displayedDatums.length - 1, currentIndex + 1);
       $($('.tt-suggestion')[currentIndex]).addClass('selected');
