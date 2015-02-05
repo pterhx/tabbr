@@ -25,20 +25,22 @@
   },
 
   "background": {
-    "scripts": ["underscore.js",
-                "lexicon.js",
-                "lexer.js",
-                "POSTagger.js",
-                "inflection.js",
-                "glossary.js",
-                "jquery.js",
-                "background.js"]
+    "scripts": [
+      "js/underscore.js",
+      "js/lexicon.js",
+      "js/lexer.js",
+      "js/POSTagger.js",
+      "js/inflection.js",
+      "js/glossary.js",
+      "js/jquery.js",
+      "js/background.js"
+    ]
   },
 
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
+      "js": ["js/content.js"]
     }
   ],
 
