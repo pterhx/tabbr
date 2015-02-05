@@ -1,4 +1,8 @@
-tabs = {};
+'use strict';
+
+var tabs = {};
+var tabInWindow = {};
+var lastActiveTabId = 0;
 
 var addPrefix = function(prefix, tabId) {
   var tab = tabs[tabId];
@@ -26,14 +30,14 @@ var getTitleToken = function(term) {
 
 var tokenize = function(tab) {
   var terms = tab.title.split(' ').filter(gtThree);
-  var regex = /:\/\/(.[^/]+)/
+  var regex = /:\/\/(.[^/]+)/;
   var hostTerms = tab.url.match(regex);
   // TODO: Handle case when URL is empty.
   if (hostTerms !== null) {
     hostTerms = hostTerms[1].split('.').filter(gtThree);
     terms = terms.concat(hostTerms);
   }
-  tokens = terms.map(getTitleToken);
+  var tokens = terms.map(getTitleToken);
   if (tokens.length > 0) {
     tokens[0].weight = 1.5;
   }
@@ -48,12 +52,12 @@ var createDatum = function(tab) {
     favIconUrl: tab.favIconUrl,
     id: tab.id,
     prefixMap: {}
-  }
+  };
 };
 
 var getDatums = function() {
-  datums = []
-  for(tabId in tabs) {
+  var datums = [];
+  for (var tabId in tabs) {
     if (tabs[tabId].id !== lastActiveTabId) {
       datums.push(tabs[tabId]);
     }
@@ -63,23 +67,23 @@ var getDatums = function() {
 
 var addKeywords = function(tab) {
   chrome.tabs.sendMessage(tab.id, {}, function(response) {
-    datum = tabs[tab.id];
+    var datum = tabs[tab.id];
     if (typeof datum === 'undefined' || typeof response === 'undefined') {
       return;
     }
-    terms = glossary.extract(response.text);
+    var terms = glossary.extract(response.text);
 
-    tokens = _.map(terms, function(term) {
+    var tokens = _.map(terms, function(term) {
       var weight = Math.min(term.count / 10, 0.7);
       return {
         term: term.word.toLowerCase(),
         weight: weight
-      }
+      };
     });
 
     datum.tokens = datum.tokens.concat(tokens);
   });
-}
+};
 
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
@@ -112,8 +116,6 @@ var onTabRemoved = function(tabId, removeInfo) {
   delete tabInWindow[removeInfo.windowId];
 };
 
-var tabInWindow = {};
-var lastActiveTabId = 0;
 var onTabActivated = function(activeInfo) {
   var tabId = activeInfo.tabId,
       windowId = activeInfo.windowId;
@@ -138,12 +140,7 @@ var onTabActivated = function(activeInfo) {
     tabs[tabId].active = true;
     tabInWindow[windowId] = tabId;
   }, 1000);
-  chrome.tabs.captureVisibleTab(windowId, {format: 'png'}, function(url) {
-    if (typeof tabs[tabId] !== 'undefined') {
-      tabs[tabId].previewUrl = url;
-    }
-  });
-}
+};
 
 var onTabReplaced = function(addedTabId, removedTabId) {
   tabs[addedTabId] = tabs[removedTabId];
@@ -158,23 +155,13 @@ var onTabReplaced = function(addedTabId, removedTabId) {
   }
 };
 
-var getDatumsByTime = function(after, before) {
-  datums = []
-  for(var tabId in tabs) {
-    if (after < tabs[tabId].lastAccessTime && tabs[tabId].lastAccessTime < before) {
-      datums.push(tabs[tabId]);
-    }
-  }
-  return datums;
-};
-
 var onMessage = function(request, sender, sendResponse) {
   switch (request.cmd) {
   case 'getDatums':
     sendResponse({datums: getDatums()});
     break;
   case 'addPrefix':
-    str = request.prefix;
+    var str = request.prefix;
     while(str !== '') {
       addPrefix(str, request.tabId);
       str = str.slice(0, -1);
