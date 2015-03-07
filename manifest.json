@@ -14,9 +14,11 @@
   "version": "0.0.0.7",
 
   "permissions": [
+    "activeTab",
     "tabs",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "<all_urls>"
   ],
 
   "browser_action": {

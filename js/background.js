@@ -46,7 +46,7 @@ var tokenize = function(tab) {
 
 var createDatum = function(tab) {
   return {
-    value: tab.title,
+    title: tab.title,
     windowId: tab.windowId,
     tokens: tokenize(tab),
     favIconUrl: tab.favIconUrl,
@@ -87,7 +87,7 @@ var addKeywords = function(tab) {
 
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
-  tabs[tab.id].lastAccessTime = new Date();
+  tabs[tab.id].lastAccessTime = (new Date()).getTime();
   if (tab.status === 'complete') {
     addKeywords(tab);
   }
@@ -124,22 +124,23 @@ var onTabActivated = function(activeInfo) {
     return;
   }
   reloadTab(tabId);
-  if (typeof this.timeoutCallback === 'undefined') {
-    this.timeoutCallback = null;
-    tabInWindow = {};
+  if (typeof tabInWindow[windowId] !== 'undefined') {
+    tabs[tabInWindow[windowId]].lastAccessTime = (new Date()).getTime();
+    tabs[tabInWindow[windowId]].active = false;
   }
-  if (this.timeoutCallback != null) {
-    window.clearTimeout(this.timeoutCallback);
-  }
-  this.timeoutCallback = window.setTimeout(function() {
-    if (typeof tabInWindow[windowId] !== 'undefined') {
-      tabs[tabInWindow[windowId]].lastAccessTime = new Date();
-      tabs[tabInWindow[windowId]].active = false;
+  tabs[tabId].lastAccessTime = (new Date()).getTime();
+  tabs[tabId].active = true;
+  tabInWindow[windowId] = tabId;
+  chrome.tabs.captureVisibleTab(
+    windowId,
+    {
+      format: 'jpeg',
+      quality: 1
+    }, function(url) {
+    if (typeof tabs[tabId] !== 'undefined') {
+      tabs[tabId].previewUrl = url;
     }
-    tabs[tabId].lastAccessTime = new Date();
-    tabs[tabId].active = true;
-    tabInWindow[windowId] = tabId;
-  }, 1000);
+  });
 };
 
 var onTabReplaced = function(addedTabId, removedTabId) {

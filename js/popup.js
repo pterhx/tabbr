@@ -1,4 +1,5 @@
-var template = '<div><img width="19px" height="19px" src="{{favIconUrl}}"/> {{value}}<a class="indx">{{index}}</a></div>';
+var template = '<div><img width="19px" height="19px" src="{{favIconUrl}}"/> {{title}}<a class="indx">{{index}}</a></div>';
+
 chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   var $tabsearch = $('#tab-search');
   var $previewImg = $('#preview-img');
@@ -45,7 +46,7 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
   };
 
   response.datums = _.sortBy(response.datums, function(datum) {
-    return -(new Date(datum.lastAccessTime)).getTime();
+    return -datum.lastAccessTime;
   });
   for (var i=0; i < response.datums.length; i++) {
     drawDatum(response.datums[i]);
@@ -173,17 +174,16 @@ chrome.runtime.sendMessage({cmd: 'getDatums'}, function(response) {
         filter = queryNfilter[1],
         datums = typeof filter === "undefined" ? response.datums
                                                : response.datums.filter(filter);
-    datums.forEach(function(datum) {
-      datumScore(query, datum);
+    var options = {
+        keys: ['title']
+    };
+    var fuse = new Fuse(datums, options);
+    datums = fuse.search(query);
+
+    _.each(datums, function(datum) {
+        drawDatum(datum);
     });
 
-    sortedDatums = _.sortBy(datums, compareDatum);
-    for (var i=0; i < sortedDatums.length; i++) {
-      var datum = sortedDatums[i];
-      if (datum.score >= query.length / 10) {
-        drawDatum(datum);
-      }
-    }
     if (displayedDatums.length === 0) {
       var noResult = document.createElement('p');
       noResult.innerText = 'no results found :(';
