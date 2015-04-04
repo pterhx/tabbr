@@ -31,7 +31,8 @@
       "js/underscore.js",
       "js/jquery.js",
       "js/background.js"
-    ]
+    ],
+    "persistent": false
   },
 
   "content_scripts": [
