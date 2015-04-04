@@ -29,11 +29,6 @@
   "background": {
     "scripts": [
       "js/underscore.js",
-      "js/lexicon.js",
-      "js/lexer.js",
-      "js/POSTagger.js",
-      "js/inflection.js",
-      "js/glossary.js",
       "js/jquery.js",
       "js/background.js"
     ]

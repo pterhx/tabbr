@@ -65,50 +65,13 @@ var getDatums = function() {
   return datums;
 };
 
-var addKeywords = function(tab) {
-  chrome.tabs.sendMessage(tab.id, {}, function(response) {
-    var datum = tabs[tab.id];
-    if (typeof datum === 'undefined' || typeof response === 'undefined') {
-      return;
-    }
-    var terms = glossary.extract(response.text);
-
-    var tokens = _.map(terms, function(term) {
-      var weight = Math.min(term.count / 10, 0.7);
-      return {
-        term: term.word.toLowerCase(),
-        weight: weight
-      };
-    });
-
-    datum.tokens = datum.tokens.concat(tokens);
-  });
-};
-
 var onTabCreated = function(tab) {
   tabs[tab.id] = createDatum(tab);
   tabs[tab.id].lastAccessTime = (new Date()).getTime();
-  if (tab.status === 'complete') {
-    addKeywords(tab);
-  }
-};
-
-var reloadTab = function(tabId) {
-  chrome.tabs.get(tabId, function(tab) {
-    tabs[tab.id] = createDatum(tab);
-    if (tab.status !== 'complete') {
-      reloadTab(tab.id);
-    }
-  });
 };
 
 var onTabUpdated = function(tabId, changeInfo, tab) {
   tabs[tabId] = createDatum(tab);
-  if (changeInfo.status === 'complete') {
-    addKeywords(tab);
-  } else {
-    reloadTab(tabId);
-  }
 };
 
 var onTabRemoved = function(tabId, removeInfo) {
@@ -123,7 +86,6 @@ var onTabActivated = function(activeInfo) {
   if (typeof tabs[tabId] === 'undefined') {
     return;
   }
-  reloadTab(tabId);
   if (typeof tabInWindow[windowId] !== 'undefined') {
     tabs[tabInWindow[windowId]].lastAccessTime = (new Date()).getTime();
     tabs[tabInWindow[windowId]].active = false;
@@ -135,12 +97,18 @@ var onTabActivated = function(activeInfo) {
     windowId,
     {
       format: 'jpeg',
-      quality: 1
-    }, function(url) {
-    if (typeof tabs[tabId] !== 'undefined') {
-      tabs[tabId].previewUrl = url;
+      quality: 0
+    },
+    function(url) {
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError.message);
+        return;
+      }
+      if (typeof tabs[tabId] !== 'undefined') {
+        tabs[tabId].previewUrl = url;
+      }
     }
-  });
+  );
 };
 
 var onTabReplaced = function(addedTabId, removedTabId) {
