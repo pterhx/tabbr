@@ -12,21 +12,19 @@ body {
 #main-container {
   height: 100%;
 }
-#logo {
-  padding-left: 20px;
-}
-#logo h3 {
+h3 {
   color: white;
-  font-weight: 300px;
-  text-decoration: italic;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 0.25em;
 }
 #tab-select {
-  padding-top: 10px;
+  padding-top: 0.9375em;
   background: white;
 }
 #preview {
-  padding-top: 5px;
-  padding-bottom: 10px;
+  padding-top: 0.25em;
+  padding-bottom: 0.9375em;
 }
 
 #preview h2 {
